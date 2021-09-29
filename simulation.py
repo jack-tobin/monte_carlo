@@ -23,6 +23,20 @@ class Simulation:
     
     def __init__(self, init_wealth, exp_ret, exp_vol, n_trials, n_years):
         """
+        Initializes Simulation Class
+
+        Parameters
+        ----------
+        init_wealth : int
+            starting wealth i.e. £100.
+        exp_ret : float
+            Expected Annual Return .
+        exp_vol : float
+            Expected Volatility.
+        n_trials : int
+            Number of Trials, use 10000.
+        n_years : int
+            Number of Years.
         """
 
         # input paramters
@@ -46,6 +60,9 @@ class Simulation:
         
     def simulate_values(self):
         """
+        Runs the simulation. Calls in the MarkovChain class and uses it
+        to generate a set of returns. Then computes annual returns and finally
+        portfolio values based on those annual returns.
         """
         
         # instantiate Markov Chain Returns process
@@ -67,20 +84,4 @@ class Simulation:
             self.values[:, i+1] = self.values[:, i] * (1 + self.returns[:, i])
             
         return self
-    
-
-# testing
-init_w = 100
-exp_ret = 0.09
-exp_vol = 0.18
-n_trials = 500
-n_years = 30
-
-# initiate
-sim = Simulation(init_w, exp_ret, exp_vol, n_trials, n_years)
-sim.simulate_values()
-
-# histogram
-x = pd.Series(sim.values.reshape(-1, 1).ravel())
-sns.histplot(np.log(x))
     
