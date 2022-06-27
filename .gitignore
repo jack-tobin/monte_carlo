@@ -6,3 +6,4 @@ __pycache__/
 .ipynb_checkpoints/
 /montecarlo_cpp/.vscode/*.json
 *.csv
+/montecarlo_cpp/.vscode
