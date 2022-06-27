@@ -13,8 +13,6 @@ import matplotlib.pyplot as plt
 import seaborn as sns
 import scipy
 
-os.chdir(os.path.expanduser('~/Documents/projects/montecarlo'))
-
 # load in markov chain class
 from markov_chain import MarkovChain
 
@@ -49,9 +47,6 @@ class Simulation:
         # additional params
         self.days_per_year = 252
         self.n_days = self.n_years * self.days_per_year
-        self.daily_ret = self.exp_ret / self.days_per_year
-        self.daily_geo_ret = (1 + self.exp_ret) ** (1 / self.days_per_year) - 1
-        self.daily_vol = self.exp_vol / np.sqrt(self.days_per_year)
         
         # empty matrices
         self.daily_returns = np.zeros(shape=(self.n_trials, self.n_days))
@@ -66,8 +61,8 @@ class Simulation:
         """
         
         # instantiate Markov Chain Returns process
-        mc = MarkovChain(self.daily_geo_ret, self.daily_vol, self.n_trials,
-                         self.n_days)
+        mc = MarkovChain(self.exp_ret, self.exp_vol, self.n_trials,
+                         self.n_years, self.days_per_year)
         
         # generate returns based on regime switching algorithm
         self.daily_returns = mc.generate_returns()
@@ -84,4 +79,3 @@ class Simulation:
             self.values[:, i+1] = self.values[:, i] * (1 + self.returns[:, i])
             
         return self
-    

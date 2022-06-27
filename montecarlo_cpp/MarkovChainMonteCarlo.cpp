@@ -19,10 +19,10 @@ using namespace std;
  * @param new_annual_volatility   double annual volatility estimate
  * @param new_num_trials          int number of trials (recomm. 10k)
  * @param new_num_years           int number of years to simulate
- * @param new_periodicity         char simulation granularity
+ * @param new_periodicity         simulation granularity
  */
 MarkovChainMonteCarlo::MarkovChainMonteCarlo(double new_annual_return, double new_annual_volatility, 
-  int new_num_trials, int new_num_years, char new_periodicity) {
+  int new_num_trials, int new_num_years, int new_periodicity) {
   
   // set input attributes
   annual_return = new_annual_return;
@@ -32,12 +32,11 @@ MarkovChainMonteCarlo::MarkovChainMonteCarlo(double new_annual_return, double ne
   periodicity = new_periodicity;
 
   // compute total periods
-  periods_per_year = convertPeriodicityToPeriods(new_periodicity);
-  num_periods = periods_per_year * num_years;
+  num_periods = new_periodicity * num_years;
 
   // compute de-annualised return and volatility
-  periodic_return = deAnnualiseReturn(annual_return, periods_per_year);
-  periodic_volatility = deAnnualiseVolatility(annual_volatility, periods_per_year);
+  periodic_return = deAnnualiseReturn(annual_return, periodicity);
+  periodic_volatility = deAnnualiseVolatility(annual_volatility, periodicity);
 
   // empty arrays for states and returns
   rands = new double*[num_trials];
@@ -49,40 +48,6 @@ MarkovChainMonteCarlo::MarkovChainMonteCarlo(double new_annual_return, double ne
     returns[i] = new double[num_periods];
   }  
 }
-
-/**
- * @brief Converts periodicity specified as char to number of periods per year
- * specified as int.
- * 
- * @param periodicity   char Periodicity i.e. 'd', 'm', 'q' etc.
- * @return int n_pers   the number of periods per year.
- */
-int MarkovChainMonteCarlo::convertPeriodicityToPeriods(char periodicity) {
-    int n_pers;
-    // determine number of periods based on stated periodicity
-    switch (periodicity) {
-      case 'd':
-        n_pers = 252; // daily
-        break;
-      case 'w':
-        n_pers = 52;  // weekly
-        break;
-      case 'm':
-        n_pers =12;   // monthly
-        break;
-      case 'q':
-        n_pers = 4;   // quarterly
-        break;
-      case 'y':
-        n_pers = 1;   // weekly
-        break;
-      default:
-        n_pers = 1;   // default annual
-        break;
-    }
-
-    return n_pers;
-  }
 
 /**
  * @brief Generates the matrix of periodic returns from the markov chain
@@ -242,6 +207,10 @@ void MarkovChainMonteCarlo::fillStatesArray() {
 }
 
 // getters
+
+double** MarkovChainMonteCarlo::getReturns() {
+  return returns;
+}
 
 /**
  * @brief Gets Num Periods object.
@@ -520,10 +489,31 @@ void MarkovChainMonteCarlo::setNumYears(int new_num_years) {
  * 
  * Note this also adjusts periods_per_year and num_periods to be consistent.
  * 
- * @param new_periodicity char New value of periodicity.
+ * @param new_periodicity int New value of periodicity.
  */
-void MarkovChainMonteCarlo::setPeriodicity(char new_periodicity) {
+void MarkovChainMonteCarlo::setPeriodicity(int new_periodicity) {
   periodicity = new_periodicity;
-  periods_per_year = convertPeriodicityToPeriods(periodicity);
-  num_periods = periods_per_year * num_years;
+  num_periods = new_periodicity * num_years;
+}
+
+/**
+ * @brief External "C" functions for use in Python environment.
+ */
+extern "C" {
+  // initialise
+	__declspec(dllexport) MarkovChainMonteCarlo* init(double new_annual_return,
+      double new_annual_volatility, int new_num_trials, int new_num_years, 
+      int new_periodicity) {
+		return new MarkovChainMonteCarlo(new_annual_return, new_annual_volatility, 
+      new_num_trials, new_num_years, new_periodicity);
+	}
+
+  // methods
+	__declspec(dllexport) void generateReturns(MarkovChainMonteCarlo *self) {
+    self->generateReturns();
+  }
+
+  __declspec(dllexport) double** getReturns(MarkovChainMonteCarlo *self) {
+    return self->getReturns();
+  }
 }

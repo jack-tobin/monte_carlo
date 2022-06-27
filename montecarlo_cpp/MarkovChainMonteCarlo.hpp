@@ -10,8 +10,6 @@
 #include <cmath>
 #include <iostream>
 
-using namespace std;
-
 class MarkovChainMonteCarlo {
 
 private:
@@ -22,7 +20,7 @@ private:
   double periodic_volatility;
   int num_trials;
   int num_years;
-  char periodicity;
+  int periodicity;
   int num_periods;
   int periods_per_year;
 
@@ -51,15 +49,6 @@ private:
   double** states;
   
   // private method declarations
-
-  /**
-   * @brief Converts periodicity given in char form to number of periods 
-   * pear year 
-   * 
-   * @param periodicity   char Frequency.
-   * @return int Number of periods per year.
-   */
-  int convertPeriodicityToPeriods(char periodicity);
 
   /**
    * @brief De-annualise an annual return into desired periodicity.
@@ -113,10 +102,10 @@ public:
    * @param new_annual_volatility   double Annual volatility.
    * @param new_num_trials          int Number of simulations.
    * @param new_num_years           int Number of years.
-   * @param new_periodicity         char Periodicity.
+   * @param new_periodicity         int Periodicity.
    */
   MarkovChainMonteCarlo(double new_annual_return, double new_annual_volatility, 
-    int new_num_trials, int new_num_years, char new_periodicity);
+    int new_num_trials, int new_num_years, int new_periodicity);
 
   // public method declarations
 
@@ -126,6 +115,13 @@ public:
   void generateReturns();
   
   // getters
+
+  /**
+   * @brief Get the Returns object
+   * 
+   * @return double** returns
+   */
+  double** getReturns();
 
   /**
    * @brief Get the Num Periods object
@@ -307,7 +303,7 @@ public:
   /**
    * @brief Set the Periodicity object
    * 
-   * @param new_periodicity char New periodicity
+   * @param new_periodicity int New periodicity
    */
-  void setPeriodicity(char new_periodicity);
+  void setPeriodicity(int new_periodicity);
 };

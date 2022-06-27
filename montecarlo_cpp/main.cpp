@@ -10,6 +10,7 @@
 #include <string>
 #include <random>
 #include <cmath>
+#include <fstream>
 
 // include MCMC class
 #include "MarkovChainMonteCarlo.hpp"
@@ -23,7 +24,7 @@ int main() {
   // simulation parameters
   const int n_simulations = 10000;
   const int n_years = 30;
-  char periodicity = 'd';
+  int periodicity = 1;
 
   // normal distribtion parameters
   double ann_mean = 0.10;
@@ -35,30 +36,20 @@ int main() {
   // generate returns from mcmc class
   mcmc.generateReturns();
 
-  // get periods
+  // get numbers
   const int n_periods = mcmc.getNumPeriods();
 
-  // initiate empty prices matrix
-  double** prices = new double*[n_simulations];
-  for (int i = 0; i < n_simulations; i++) {
-    prices[i] = new double[n_periods+1];
-  }
-
-  // populate starting values of $1
-  for (int i = 0; i < n_simulations; i++) {
-    prices[i][0] = 1.0;
-  }
-
-  // compute prices
-  for (int i = 0; i < n_simulations; i++) {
+  // write some to csv
+  std::ofstream myFile("data.csv");
+  for (int i = 0; i < 100; i++) {
     for (int j = 0; j < n_periods; j++) {
-      prices[i][j+1] = prices[i][j] * (1 + mcmc.returns[i][j]);
+      myFile << mcmc.returns[i][j] << "\n";
     }
+    //myFile << "\n";
   }
-
-  // print a few values
-  cout << prices[5][10] << endl;
-  cout << prices[23][42] << endl;
-
+  
+  // Close the file
+  myFile.close();
+  
   return 0;
 };
