@@ -497,23 +497,20 @@ void MarkovChainMonteCarlo::setPeriodicity(int new_periodicity) {
 }
 
 /**
- * @brief External "C" functions for use in Python environment.
+ * @brief External C functions for use in Python environment.
  */
 extern "C" {
   // initialise
-	__declspec(dllexport) MarkovChainMonteCarlo* init(double new_annual_return,
-      double new_annual_volatility, int new_num_trials, int new_num_years, 
-      int new_periodicity) {
-		return new MarkovChainMonteCarlo(new_annual_return, new_annual_volatility, 
-      new_num_trials, new_num_years, new_periodicity);
+	MarkovChainMonteCarlo* init(double new_annual_return, double new_annual_volatility, int new_num_trials, int new_num_years, int new_periodicity) {
+		return new MarkovChainMonteCarlo(new_annual_return, new_annual_volatility, new_num_trials, new_num_years, new_periodicity);
 	}
 
   // methods
-	__declspec(dllexport) void generateReturns(MarkovChainMonteCarlo *self) {
+	void generateReturns(MarkovChainMonteCarlo *self) {
     self->generateReturns();
   }
 
-  __declspec(dllexport) double** getReturns(MarkovChainMonteCarlo *self) {
+  double **getReturns(MarkovChainMonteCarlo *self) {
     return self->getReturns();
   }
 }
